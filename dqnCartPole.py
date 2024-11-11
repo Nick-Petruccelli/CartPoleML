@@ -3,9 +3,10 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 from collections import deque
+import matplotlib.pyplot as plt
 
 class DQN:
-    def __init__(self, batch_size=32, discount_factor=.95, optimizer=keras.optimizers.Adam(lr=1e-3), loss_fn=keras.losses.mean_squared_error):
+    def __init__(self, batch_size=32, discount_factor=.95, optimizer=keras.optimizers.Adam(learning_rate=1e-3), loss_fn=keras.losses.MeanSquaredError()):
         input_shape = [4]
         self.n_outputs = 2
         self.model = keras.models.Sequential([
@@ -29,7 +30,7 @@ class DQN:
     def sample_experiences(self):
         indices = np.random.randint(len(self.replay_buffer), size=self.batch_size)
         batch = [self.replay_buffer[i] for i in indices]
-        states, actions, rewards, next_states, dones = [np.array([experience[field_index] for experience in batch for field_index in range(5)])]
+        states, actions, rewards, next_states, dones = [np.array([experience[field_index] for experience in batch]) for field_index in range(5)]
         return states, actions, rewards, next_states, dones
 
     def play_one_step(self, env, state, epsilon):
@@ -64,7 +65,8 @@ class DQN:
                     break
             if episode > 50:
                 self.training_step()
-
+        plt.plot(rewards_per_episode)
+        plt.show()
 
 
 
@@ -73,4 +75,5 @@ class DQN:
 if __name__ == "__main__":
     env = gym.make("CartPole-v0")
     model = DQN()
+    model.train(env)
 
