@@ -3,6 +3,8 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 from collections import deque
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 class DQN:
@@ -57,16 +59,18 @@ class DQN:
         rewards_per_episode = []
         for episode in range(n_episodes):
             obs = env.reset()
+            reward_total = 0
             for step in range(max_steps):
                 epsilon = max(1 - episode / 500, .01)
                 obs, reward, done, info = self.play_one_step(env, obs, epsilon)
+                reward_total += reward
                 if done:
-                    rewards_per_episode.append(reward)
+                    rewards_per_episode.append(reward_total)
                     break
             if episode > 50:
                 self.training_step()
         plt.plot(rewards_per_episode)
-        plt.show()
+        plt.savefig("plots/dqnres.png")
 
 
 
