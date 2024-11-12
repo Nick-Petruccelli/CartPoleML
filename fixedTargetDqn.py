@@ -61,11 +61,12 @@ class DQN:
 
     def train(self, env, n_episodes=600, max_steps=200):
         rewards_per_episode = []
+        epsilon_denominator = int(n_episodes * .8)
         for episode in range(n_episodes):
             obs = env.reset()
             reward_total = 0
             for step in range(max_steps):
-                epsilon = max(1 - episode / 500, .01)
+                epsilon = max(1 - episode / epsilon_denominator, .01)
                 obs, reward, done, info = self.play_one_step(env, obs, epsilon)
                 reward_total += reward
                 if done:
